@@ -1,0 +1,40 @@
+    <Resource name="jdbc/globalUser"
+        auth="Container"
+        type="javax.sql.DataSource"
+        driverClassName="{{ .Env.JDBC_CLASS }}"
+        jdbcInterceptors="StatementCache(prepared=true,callable=false,max=2000)"
+        factory="org.apache.tomcat.jdbc.pool.DataSourceFactory"
+        url="{{ .Env.JDBC_URL }}"
+        {{ if eq .Env.NODE_TYPE "Batch" }}
+        username="{{ .Env.BATCH_DB_USERNAME }}"
+        password="{{ .Env.BATCH_DB_PASSWORD }}"
+
+        {{ else if eq .Env.NODE_TYPE "Stream" }}
+        username="{{ .Env.ADM_DB_USERNAME }}"
+        password="{{ .Env.ADM_DB_PASSWORD }}"
+
+        {{ else if eq .Env.NODE_TYPE "WebUser" }}
+        username="{{ .Env.INBOUND_DB_USERNAME }}"
+        password="{{ .Env.INBOUND_DB_PASSWORD }}"
+
+        {{ else if or (eq .Env.NODE_TYPE "ADM") (eq .Env.NODE_TYPE "BackgroundProcessing")  (eq .Env.NODE_TYPE "others") }}
+        username="{{ .Env.ADM_DB_USERNAME }}"
+        password="{{ .Env.ADM_DB_PASSWORD }}"
+
+        {{ end }}
+        maxActive="{{ .Env.JDBC_MAX_ACTIVE }}"
+        maxIdle="{{ .Env.JDBC_MIN_IDLE }}"
+        minIdle="{{ .Env.JDBC_MIN_IDLE }}"
+        initialSize="{{ .Env.JDBC_INITIAL_SIZE }}"
+        maxWaitMillis="{{ .Env.JDBC_MAX_WAIT }}"
+        testWhileIdle="false"
+        testOnBorrow="true"
+        testOnReturn="false"
+        validationQuery="{{ .Env.JDBC_VALIDATION_QUERY }}"
+        validationInterval="30000"
+        removeAbandoned="false"
+        removeAbandonedTimeout="300"
+        connectionProperties="{{ .Env.JDBC_CONNECTION_PROPERTIES }};{{ .Env.JDBC_TIMEOUT_PROPERTIES }}"
+        timeBetweenEvictionRunsMillis="{{ .Env.JDBC_TIME_BETWEEN_EVICTIONS }}"
+        minEvictableIdleTimeMillis="{{ .Env.JDBC_MIN_EVICTABLE_IDLE_TIME }}"
+    />
